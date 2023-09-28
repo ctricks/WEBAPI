@@ -44,13 +44,15 @@ namespace WEBAPI.Controllers
             return Ok(new { message = "Registration successful" });
         }
 
-        [HttpGet]
+        [AllowAnonymous]
+        [HttpGet("Lists")]
         public IActionResult GetAll()
         {
             var users = _userService.GetAll();
             return Ok(users);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
@@ -58,6 +60,7 @@ namespace WEBAPI.Controllers
             return Ok(user);
         }
 
+        [AllowAnonymous]
         [HttpPut("{id}")]
         public IActionResult Update(int id, UpdateRequest model)
         {
@@ -65,6 +68,7 @@ namespace WEBAPI.Controllers
             return Ok(new { message = "User updated successfully" });
         }
 
+        [AllowAnonymous]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
