@@ -69,8 +69,22 @@ namespace WEBAPI.Services
             // hash password
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
 
+            //CB-09292023 user TokenID 
+            
+
+            // save ewallet            
+
+            List<UserWallet>wallet = new List<UserWallet>();
+
+            UserWallet uwallet = new UserWallet { available_balance = 0,total_balance=0};
+            
+            wallet.Add(uwallet);
+
+            user.UWallet = wallet;
+           
             // save user
             _context.Users.Add(user);
+            
             _context.SaveChanges();
         }
 

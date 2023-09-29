@@ -19,6 +19,6 @@ namespace WEBAPI.Helpers
             options.UseSqlServer(Configuration.GetConnectionString("WebApiDatabase"));
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; }        
     }
 }

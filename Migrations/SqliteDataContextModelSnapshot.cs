@@ -74,9 +74,6 @@ namespace WEBAPI.Migrations
                     b.Property<double?>("total_balance")
                         .HasColumnType("REAL");
 
-                    b.Property<int?>("user_id")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");

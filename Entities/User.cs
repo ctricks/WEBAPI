@@ -11,7 +11,7 @@ namespace WEBAPI.Entities
         public string? Role { get; set; }
         public string? TokenID { get; set; }
 
-        public ICollection<UserWallet> UWallet { get; } = new List<UserWallet>();
+        public virtual ICollection<UserWallet> UWallet { get; set; }
 
         [JsonIgnore]
         public string? PasswordHash { get; set; }

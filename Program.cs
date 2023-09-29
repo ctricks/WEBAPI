@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using WEBAPI.Authorization;
 using WEBAPI.Helpers;
 using WEBAPI.Services;
@@ -19,7 +21,7 @@ builder.Services.AddSwaggerGen();
 
     // use sql server db in production and sqlite db in development
     if (env.IsProduction())
-        services.AddDbContext<DataContext>();
+        services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("WebApiDatabase")));
     else
         services.AddDbContext<DataContext, SqliteDataContext>();
 

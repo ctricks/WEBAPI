@@ -11,8 +11,8 @@ using WEBAPI.Helpers;
 namespace WEBAPI.Migrations
 {
     [DbContext(typeof(SqliteDataContext))]
-    [Migration("20230928203357_InitialCSAPIDB")]
-    partial class InitialCSAPIDB
+    [Migration("20230929132127_InitialDBContext")]
+    partial class InitialDBContext
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -75,9 +75,6 @@ namespace WEBAPI.Migrations
 
                     b.Property<double?>("total_balance")
                         .HasColumnType("REAL");
-
-                    b.Property<int?>("user_id")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WEBAPI.Migrations
 {
-    public partial class InitialCSAPIDB : Migration
+    public partial class InitialDBContext : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -34,7 +34,6 @@ namespace WEBAPI.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    user_id = table.Column<int>(type: "INTEGER", nullable: true),
                     available_balance = table.Column<double>(type: "REAL", nullable: true),
                     total_balance = table.Column<double>(type: "REAL", nullable: true),
                     create_ts = table.Column<DateTime>(type: "TEXT", nullable: false),
