@@ -20,10 +20,13 @@ builder.Services.AddSwaggerGen();
     var env = builder.Environment;
 
     // use sql server db in production and sqlite db in development
-    if (env.IsProduction())
-        services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("WebApiDatabase")));
-    else
-        services.AddDbContext<DataContext, SqliteDataContext>();
+    //if (env.IsProduction())
+    //    services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("WebApiDatabase")));
+    //else
+    //    services.AddDbContext<DataContext, SqliteDataContext>();
+
+    //For AzureConnection
+    services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("WebApiDatabase")));
 
     services.AddCors();
     services.AddControllers();
