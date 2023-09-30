@@ -15,6 +15,7 @@ namespace WEBAPI.Services
         void Register(RegisterRequest model);
         void Update(int id, UpdateRequest model);
         void Delete(int id);
+        void Logout(int id);
     }
 
     public class UserService : IUserService
@@ -44,6 +45,14 @@ namespace WEBAPI.Services
             // authentication successful
             var response = _mapper.Map<AuthenticateResponse>(user);
             response.Token = _jwtUtils.GenerateToken(user);
+
+            //CB-09302023 Update TokenID in UserTable
+            //_mapper.Map(model, user);
+            user.TokenID = response.Token;
+
+            _context.Users.Update(user);
+            _context.SaveChanges();
+
             return response;
         }
 
@@ -88,6 +97,15 @@ namespace WEBAPI.Services
             _context.SaveChanges();
         }
 
+        public void Logout(int id)
+        {
+            //CB-09302023 Get User via id
+            var user = getUser(id);
+            user.TokenID = null;
+            _context.Users.Update(user);
+            _context.SaveChanges();
+        }
+
         public void Update(int id, UpdateRequest model)
         {
             var user = getUser(id);
@@ -121,5 +139,7 @@ namespace WEBAPI.Services
             if (user == null) throw new KeyNotFoundException("User not found");
             return user;
         }
+
+
     }
 }

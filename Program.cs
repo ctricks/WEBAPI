@@ -40,6 +40,13 @@ builder.Services.AddSwaggerGen();
     // configure DI for application services
     services.AddScoped<IJwtUtils, JwtUtils>();
     services.AddScoped<IUserService, UserService>();
+    services.AddScoped<IWalletTransactionsService, WalletTransactionsService>();
+
+
+    services.AddSwaggerGen(options =>
+    {
+        options.CustomSchemaIds(type => type.ToString());
+    });
 }
 
 
@@ -56,6 +63,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();

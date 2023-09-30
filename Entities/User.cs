@@ -11,6 +11,7 @@ namespace WEBAPI.Entities
         public string? Role { get; set; }
         public string? TokenID { get; set; }
 
+        //For reference UserWallet Table
         public virtual ICollection<UserWallet> UWallet { get; set; }
 
         [JsonIgnore]

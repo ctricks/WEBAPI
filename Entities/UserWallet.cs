@@ -8,6 +8,10 @@ namespace WEBAPI.Entities
         public double? available_balance { get; set; }
         public double? total_balance { get; set; }
 
+        public int? UserId { get; set; }
+        
+        public virtual ICollection<WalletTxn> WalletTrans { get; set; }
+
         [Column("create_ts")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 

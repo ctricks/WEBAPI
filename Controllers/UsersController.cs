@@ -29,7 +29,7 @@ namespace WEBAPI.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("authenticate")]
+        [HttpPost("Authenticate")]
         public IActionResult Authenticate(AuthenticateRequest model)
         {
             var response = _userService.Authenticate(model);
@@ -37,7 +37,7 @@ namespace WEBAPI.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("register")]
+        [HttpPost("Register")]
         public IActionResult Register(RegisterRequest model)
         {
             _userService.Register(model);
@@ -51,6 +51,7 @@ namespace WEBAPI.Controllers
             var users = _userService.GetAll();
             return Ok(users);
         }
+
 
         [AllowAnonymous]
         [HttpGet("{id}")]
@@ -74,6 +75,14 @@ namespace WEBAPI.Controllers
         {
             _userService.Delete(id);
             return Ok(new { message = "User deleted successfully" });
+        }
+
+        [AllowAnonymous]
+        [HttpPut("Logout/{id}")]
+        public IActionResult Logout(int id)
+        {
+            _userService.Logout(id);
+            return Ok(new { message = "User successfully logout" });
         }
     }
 }

@@ -19,6 +19,8 @@ namespace WEBAPI.Helpers
             options.UseSqlServer(Configuration.GetConnectionString("WebApiDatabase"));
         }
 
-        public DbSet<User> Users { get; set; }        
+        public DbSet<User> Users { get; set; }  
+        public DbSet<WalletTxn> WalletTxns { get; set; }
+        public DbSet<UserWallet> UserWallet { get; set; }
     }
 }
