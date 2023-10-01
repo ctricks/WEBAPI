@@ -36,6 +36,14 @@ namespace WEBAPI.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost("NewUserWallet")]
+        public IActionResult NewWallet(AuthenticateRequest model)
+        {
+            
+            return Ok(_wallettxnService.newUserWallet(model));
+        }
+
+        [AllowAnonymous]
         [HttpPost("InsertTransaction")]
         public IActionResult Transaction(RegisterRequest model)
         {

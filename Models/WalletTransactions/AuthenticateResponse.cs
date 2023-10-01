@@ -1,10 +1,12 @@
-﻿namespace WEBAPI.Models.WalletTransactions
+﻿using Org.BouncyCastle.Crypto.Generators;
+
+namespace WEBAPI.Models.WalletTransactions
 {
     public class AuthenticateResponse
     {
         public int Id { get; set; }
-        public string WalletTransaction { get; set; }
-        public double Amount { get; set; }
-        public double Account_Balance { get; set; }                
+        public string Message { get; set; }        
+        public double? TotalBalance { get; set; }
+        public double? AvailableBalance { get; set; }
     }
 }

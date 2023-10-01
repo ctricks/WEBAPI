@@ -9,6 +9,8 @@ namespace WEBAPI.Entities
         public double amount { get; set; }
         public double account_bal { get; set; }
 
+        public int UserID { get; set; }
+
         public string TokenID { get; set; }
 
         [Column("create_ts")]

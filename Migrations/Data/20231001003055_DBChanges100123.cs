@@ -2,9 +2,9 @@
 
 #nullable disable
 
-namespace WEBAPI.Migrations
+namespace WEBAPI.Migrations.Data
 {
-    public partial class InitialDBContextAzure : Migration
+    public partial class DBChanges100123 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

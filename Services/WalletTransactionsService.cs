@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using WEBAPI.Authorization;
 using WEBAPI.Entities;
 using WEBAPI.Helpers;
@@ -11,6 +12,7 @@ namespace WEBAPI.Services
         AuthenticateResponse Authenticate(AuthenticateRequest model);
         IEnumerable<WalletTxn> GetAll();
         WalletTxn GetById(int id);
+        AuthenticateResponse newUserWallet(AuthenticateRequest model);
         void Create(RegisterRequest model);
         //void Update(int id, UpdateRequest model);
         void Delete(int id);
@@ -32,13 +34,18 @@ namespace WEBAPI.Services
         public AuthenticateResponse Authenticate(AuthenticateRequest model)
         {
             //CB-09302023 Check UserCreds via TokenID, if user has null token in database... you need to login first
-            var user = _context.Users.SingleOrDefault(x => x.TokenID == model.TokenID);
+            var user = _context.Users.Any(x => x.TokenID == model.TokenID);
 
-            // validate
-            if (user == null)
+            // validate if found
+            if (user == false)
                 throw new AppException("User is not login. Please login again");
 
-            var response = _mapper.Map<AuthenticateResponse>(user);
+            AuthenticateResponse AuthRes = new AuthenticateResponse()
+            {
+                Message = "Transaction is Valid"
+            };
+
+            var response = AuthRes;
 
             //response.Message = "Wallet Transaction successfully granted";
 
@@ -54,6 +61,11 @@ namespace WEBAPI.Services
         {
             return getWallet(id);
         }
+        public AuthenticateResponse newUserWallet(AuthenticateRequest model)
+        {
+            return newuserwallet(model);
+        }
+
 
         public void Create(RegisterRequest model)
         {
@@ -69,17 +81,10 @@ namespace WEBAPI.Services
             wallettrans.account_bal = model.total_balance;
             wallettrans.TokenID = model.UserTokenID;
             wallettrans.TransactionType = model.TransactionType;
+            
 
             var userinfo = getUsersViaToken(model.UserTokenID);
 
-            //CB-09302023 Update the Userwallet then the wallet transaction as Additional
-            UserWallet userwallet = new UserWallet();
-            userwallet.WalletTrans = new List<WalletTxn>();
-            userwallet.WalletTrans.Add(wallettrans);
-            userwallet.available_balance = model.available_balance;
-            userwallet.total_balance = model.total_balance;
-            userwallet.UserId = userinfo.Id;
-            
             if (userinfo == null)
                 throw new AppException("Token is invalid. Please login");
 
@@ -87,10 +92,31 @@ namespace WEBAPI.Services
 
             if (userinfo == null)
             {
+                //CB-09302023 Update the Userwallet then the wallet transaction as Additional
+                UserWallet userwallet = new UserWallet();
+                userwallet.WalletTrans = new List<WalletTxn>();
+                userwallet.WalletTrans.Add(wallettrans);
+                userwallet.available_balance = model.available_balance;
+                userwallet.total_balance = model.total_balance;
+                userwallet.UserId = userinfo.Id;
+
                 _context.UserWallet.Add(userwallet);
             }
             else
-            {                
+            {
+                //CB-10012023 If Record exists, it will update the wallet balance using userid
+                wallettrans.UserID = userinfo.Id;
+
+                //CB-09302023 Update the Userwallet then the wallet transaction as Additional
+                UserWallet userwallet = getUWallet(userinfo.Id);
+
+                userwallet.WalletTrans = new List<WalletTxn>();
+                userwallet.WalletTrans.Add(wallettrans);
+                userwallet.available_balance = model.available_balance;
+                userwallet.total_balance = model.total_balance;
+                userwallet.UserId = userinfo.Id;
+                userwallet.UpdateDate = DateTime.Now;
+
                 _context.UserWallet.Update(userwallet);
             }
 
@@ -126,13 +152,51 @@ namespace WEBAPI.Services
         // for query wallet transaction via id
         private WalletTxn getWallet(int id)
         {
-            var wallettxn = _context.WalletTxns.Find(id);
+            var wallettxn = _context.WalletTxns.Where(x=>x.UserID == id).FirstOrDefault();
             if (wallettxn == null) throw new KeyNotFoundException("Wallet Transaction not found");
             return wallettxn;
         }
+        private AuthenticateResponse newuserwallet(AuthenticateRequest model)
+        {
+            var userinfo = getUsersViaToken(model.TokenID);
+
+            if (userinfo == null) throw new KeyNotFoundException("User Token is invalid. Please check first");
+
+
+            var wallettxn = _context.UserWallet.Where(x => x.UserId == userinfo.Id).FirstOrDefault();
+
+            AuthenticateResponse response = new AuthenticateResponse();
+
+            if (wallettxn == null)
+            {
+                UserWallet newWallet = new UserWallet()
+                {
+                    UserId = userinfo.Id,
+                    available_balance = 0,
+                    total_balance = 0
+                };
+                wallettxn = newWallet;
+                _context.UserWallet.Add(newWallet);
+                _context.SaveChanges();
+                response.Message = "New user wallet successfully created";
+                response.TotalBalance = newWallet.total_balance;
+                response.AvailableBalance = newWallet.available_balance;                
+            }
+            else
+            {
+                response.Message = "User wallet already has account";
+                response.TotalBalance = wallettxn.total_balance;
+                response.AvailableBalance = wallettxn.available_balance;
+            }
+            
+            
+            
+
+            return response;
+        }
         private UserWallet getUWallet(int id)
         {
-            var userwallet = _context.UserWallet.Find(id);
+            var userwallet = _context.UserWallet.Where(x=>x.UserId == id).FirstOrDefault();
             if (userwallet == null) throw new KeyNotFoundException("User Wallet not found");
             return userwallet;
         }
