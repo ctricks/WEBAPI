@@ -17,6 +17,7 @@ namespace WEBAPI.Helpers
         {
             // connect to sql server database            
             options.UseSqlServer(Configuration.GetConnectionString("WebApiDatabase"));
+            
         }
 
         public DbSet<User> Users { get; set; }  

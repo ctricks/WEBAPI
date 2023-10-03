@@ -78,8 +78,7 @@ namespace WEBAPI.Services
             WalletTxn wallettrans = new WalletTxn();
 
             wallettrans.amount = model.available_balance;
-            wallettrans.account_bal = model.total_balance;
-            wallettrans.TokenID = model.UserTokenID;
+            wallettrans.account_bal = model.total_balance;            
             wallettrans.TransactionType = model.TransactionType;
             
 
@@ -105,7 +104,7 @@ namespace WEBAPI.Services
             else
             {
                 //CB-10012023 If Record exists, it will update the wallet balance using userid
-                wallettrans.UserID = userinfo.Id;
+                wallettrans.UserIDRef = userinfo.Id;
 
                 //CB-09302023 Update the Userwallet then the wallet transaction as Additional
                 UserWallet userwallet = getUWallet(userinfo.Id);
@@ -152,7 +151,7 @@ namespace WEBAPI.Services
         // for query wallet transaction via id
         private WalletTxn getWallet(int id)
         {
-            var wallettxn = _context.WalletTxns.Where(x=>x.UserID == id).FirstOrDefault();
+            var wallettxn = _context.WalletTxns.Where(x=>x.UserIDRef == id).FirstOrDefault();
             if (wallettxn == null) throw new KeyNotFoundException("Wallet Transaction not found");
             return wallettxn;
         }

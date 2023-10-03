@@ -12,8 +12,8 @@ using WEBAPI.Helpers;
 namespace WEBAPI.Migrations.Data
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231003213324_UpdateTables")]
-    partial class UpdateTables
+    [Migration("20231003215909_UpdateTable3")]
+    partial class UpdateTable3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -286,16 +286,11 @@ namespace WEBAPI.Migrations.Data
                     b.Property<int?>("FightMatchId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BetUserRewardId");
 
                     b.HasIndex("FightMatchId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("UserBetTxns");
                 });
@@ -344,15 +339,11 @@ namespace WEBAPI.Migrations.Data
                         .HasColumnType("datetime2")
                         .HasColumnName("create_ts");
 
-                    b.Property<string>("TokenID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("TransactionType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserID")
+                    b.Property<int>("UserIDRef")
                         .HasColumnType("int");
 
                     b.Property<int?>("UserWalletId")
@@ -400,10 +391,6 @@ namespace WEBAPI.Migrations.Data
                     b.HasOne("WEBAPI.Entities.FightMatch", null)
                         .WithMany("UBetTxn")
                         .HasForeignKey("FightMatchId");
-
-                    b.HasOne("WEBAPI.Entities.User", null)
-                        .WithMany("UBetTxn")
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("WEBAPI.Entities.UserWallet", b =>
@@ -444,8 +431,6 @@ namespace WEBAPI.Migrations.Data
 
             modelBuilder.Entity("WEBAPI.Entities.User", b =>
                 {
-                    b.Navigation("UBetTxn");
-
                     b.Navigation("UWallet");
                 });
 

@@ -13,10 +13,7 @@ namespace WEBAPI.Entities
 
         //For reference UserWallet Table
         public virtual ICollection<UserWallet> UWallet { get; set; }
-
-        //CB-10022023 Reference for User Bet
-        public virtual ICollection<UserBetTxn> UBetTxn { get; set; }
-
+        
         [JsonIgnore]
         public string? PasswordHash { get; set; }
 

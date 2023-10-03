@@ -9,9 +9,7 @@ namespace WEBAPI.Entities
         public double amount { get; set; }
         public double account_bal { get; set; }
 
-        public int UserID { get; set; }
-
-        public string TokenID { get; set; }
+        public int UserIDRef { get; set; }
 
         [Column("create_ts")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
