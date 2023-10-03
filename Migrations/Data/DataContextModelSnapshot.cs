@@ -22,16 +22,13 @@ namespace WEBAPI.Migrations.Data
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("WEBAPI.Entities.BetColorConfig", b =>
+            modelBuilder.Entity("WEBAPI.Entities.BetColorConfigs", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("BetOddId")
-                        .HasColumnType("int");
 
                     b.Property<string>("ColorName")
                         .IsRequired()
@@ -42,8 +39,6 @@ namespace WEBAPI.Migrations.Data
                         .HasColumnName("create_ts");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BetOddId");
 
                     b.ToTable("BetColorConfigs");
                 });
@@ -56,10 +51,18 @@ namespace WEBAPI.Migrations.Data
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("BetColorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FightMatchId")
+                        .HasColumnType("int");
+
                     b.Property<double>("OddValue")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FightMatchId");
 
                     b.ToTable("BetOdds");
                 });
@@ -221,6 +224,39 @@ namespace WEBAPI.Migrations.Data
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("WEBAPI.Entities.UserAdmin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("create_ts");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TokenID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("update_ts");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserAdmins");
+                });
+
             modelBuilder.Entity("WEBAPI.Entities.UserBetTxn", b =>
                 {
                     b.Property<int>("Id")
@@ -232,17 +268,30 @@ namespace WEBAPI.Migrations.Data
                     b.Property<double>("BetAmount")
                         .HasColumnType("float");
 
+                    b.Property<int>("BetColorId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("BetDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("BetUserRewardId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("create_ts");
 
+                    b.Property<int?>("FightMatchId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BetUserRewardId");
+
+                    b.HasIndex("FightMatchId");
 
                     b.HasIndex("UserId");
 
@@ -320,11 +369,13 @@ namespace WEBAPI.Migrations.Data
                     b.ToTable("WalletTxns");
                 });
 
-            modelBuilder.Entity("WEBAPI.Entities.BetColorConfig", b =>
+            modelBuilder.Entity("WEBAPI.Entities.BetOdd", b =>
                 {
-                    b.HasOne("WEBAPI.Entities.BetOdd", null)
-                        .WithMany("BetColor")
-                        .HasForeignKey("BetOddId");
+                    b.HasOne("WEBAPI.Entities.FightMatch", null)
+                        .WithMany("UBetOdd")
+                        .HasForeignKey("FightMatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("WEBAPI.Entities.FightMatch", b =>
@@ -340,6 +391,14 @@ namespace WEBAPI.Migrations.Data
 
             modelBuilder.Entity("WEBAPI.Entities.UserBetTxn", b =>
                 {
+                    b.HasOne("WEBAPI.Entities.BetUserReward", null)
+                        .WithMany("UBetTxn")
+                        .HasForeignKey("BetUserRewardId");
+
+                    b.HasOne("WEBAPI.Entities.FightMatch", null)
+                        .WithMany("UBetTxn")
+                        .HasForeignKey("FightMatchId");
+
                     b.HasOne("WEBAPI.Entities.User", null)
                         .WithMany("UBetTxn")
                         .HasForeignKey("UserId");
@@ -359,9 +418,16 @@ namespace WEBAPI.Migrations.Data
                         .HasForeignKey("UserWalletId");
                 });
 
-            modelBuilder.Entity("WEBAPI.Entities.BetOdd", b =>
+            modelBuilder.Entity("WEBAPI.Entities.BetUserReward", b =>
                 {
-                    b.Navigation("BetColor");
+                    b.Navigation("UBetTxn");
+                });
+
+            modelBuilder.Entity("WEBAPI.Entities.FightMatch", b =>
+                {
+                    b.Navigation("UBetOdd");
+
+                    b.Navigation("UBetTxn");
                 });
 
             modelBuilder.Entity("WEBAPI.Entities.MatchResultConfig", b =>
