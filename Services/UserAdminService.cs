@@ -42,15 +42,22 @@ namespace WEBAPI.Services
                 throw new AppException("Username or password is incorrect");
 
             // authentication successful
-            var response = _mapper.Map<AdminAuthenticateResponse>(useradmin);
-            response.Token = _jwtUtils.GenerateTokenAdmin(useradmin);
+            //var response = _mapper.Map<AdminAuthenticateResponse>(useradmin);
+
+            useradmin.TokenID = _jwtUtils.GenerateTokenAdmin(useradmin);
 
             //CB-09302023 Update TokenID in UserTable
             //_mapper.Map(model, user);
-            useradmin.TokenID = response.Token;
+            //useradmin.TokenID = response.Token;
 
             _context.UserAdmins.Update(useradmin);
             _context.SaveChanges();
+
+            AdminAuthenticateResponse response = new AdminAuthenticateResponse { 
+                   Username = model.Username,
+                   Token = useradmin.TokenID,
+                   Role = useradmin.Role
+                };
 
             return response;
         }
@@ -72,10 +79,19 @@ namespace WEBAPI.Services
                 throw new AppException("Username '" + model.UserName + "' is already taken");
 
             // map model to new user object
-            var useradmin = _mapper.Map<UserAdmin>(model);
+            //var useradmin = _mapper.Map<UserAdmin>(model);
 
             // hash password
-            useradmin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
+            //useradmin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
+
+            UserAdmin useradmin = new UserAdmin
+            {
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                UserName = model.UserName,
+                Role = model.Role                
+            };
+
+            
             
             // save user
             _context.UserAdmins.Add(useradmin);

@@ -12,8 +12,8 @@ namespace WEBAPI.Services
         void SetDefault();
         BetColorConfigs GetById(int id);
         void Create(UpdateRequest model);
-        void Update(int id, UpdateRequest model);
-        void Delete(int id);
+        void Update(UpdateRequest model);
+        void Delete(int id,string TokenId);
     }
     public class ColorConfigService : IColorConfigService
     {
@@ -73,23 +73,41 @@ namespace WEBAPI.Services
             return getMatchStatus(id);
         }
 
-        public void Update(int id, UpdateRequest model)
+        public void Update(UpdateRequest model)
+        {
+            var betColor = getMatchStatus(model.ColorId);
+
+            if (betColor == null)
+                throw new AppException("Status not exists. Please check your entry");
+
+            //Check for admin tokenID
+            var user = getUserAdmin(model.TokenId);
+
+            if (user == null)
+                throw new AppException("User is invalid. Please use administrator account");
+
+            // copy model to user and save
+            //_mapper.Map(model, betColor);
+
+            betColor.ColorName = model.ColorName;
+
+            _context.BetColorConfigs.Update(betColor);
+            _context.SaveChanges();
+        }
+
+        public void Delete(int id,string TokenId)
         {
             var betColor = getMatchStatus(id);
 
             if (betColor == null)
                 throw new AppException("Status not exists. Please check your entry");
 
+            //Check for admin tokenID
+            var user = getUserAdmin(TokenId);
 
-            // copy model to user and save
-            _mapper.Map(model, betColor);
-            _context.BetColorConfigs.Update(betColor);
-            _context.SaveChanges();
-        }
+            if (user == null)
+                throw new AppException("User is invalid. Please use administrator account");
 
-        public void Delete(int id)
-        {
-            var betColor = getMatchStatus(id);
             _context.BetColorConfigs.Remove(betColor);
             _context.SaveChanges();
         }
@@ -101,8 +119,12 @@ namespace WEBAPI.Services
         }
         private User getUser(string TokenId)
         {
-            var user = _context.Users.Where(x => x.TokenID == TokenId).FirstOrDefault();
-            if (user == null) throw new KeyNotFoundException("User not found");
+            var user = _context.Users.Where(x => x.TokenID == TokenId).FirstOrDefault();            
+            return user;
+        }
+        private UserAdmin getUserAdmin(string TokenId)
+        {
+            var user = _context.UserAdmins.Where(x => x.TokenID == TokenId).FirstOrDefault();               
             return user;
         }
     }

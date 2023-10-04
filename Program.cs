@@ -40,6 +40,7 @@ builder.Services.AddSwaggerGen();
     // configure DI for application services
     services.AddScoped<IJwtUtils, JwtUtils>();
     services.AddScoped<IUserService, UserService>();
+    services.AddScoped<IUserAdminService,UserAdminService>();
     services.AddScoped<IWalletTransactionsService, WalletTransactionsService>();
     services.AddScoped<IValidation, Validation>();
     services.AddScoped<IColorConfigService, ColorConfigService>();

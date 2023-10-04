@@ -58,18 +58,18 @@ namespace WEBAPI.Controllers
             return Ok(user);
         }
         [AllowAnonymous]
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, UpdateRequest model)
+        [HttpPut()]
+        public IActionResult Update(UpdateRequest model)
         {
-            _colorconfigService.Update(id, model);
+            _colorconfigService.Update(model);
             return Ok(new { message = "Color Name updated successfully" });
         }
 
         [AllowAnonymous]
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int id, string TokenId)
         {
-            _colorconfigService.Delete(id);
+            _colorconfigService.Delete(id,TokenId);
             return Ok(new { message = "Color Name deleted successfully" });
         }
     }
