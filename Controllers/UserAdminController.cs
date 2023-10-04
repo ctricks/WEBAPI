@@ -8,22 +8,21 @@ using WEBAPI.Services;
 
 namespace WEBAPI.Controllers
 {
-
     [Authorize]
     [ApiController]
     [Route("[controller]")]
-    public class UsersController : ControllerBase
+    public class UserAdminController : ControllerBase
     {
-        private IUserService _userService;
+        private IUserAdminService _useradminService;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
 
-        public UsersController(
-            IUserService userService,
+        public UserAdminController(
+            IUserAdminService useradminService,
             IMapper mapper,
             IOptions<AppSettings> appSettings)
         {
-            _userService = userService;
+            _useradminService = useradminService;
             _mapper = mapper;
             _appSettings = appSettings.Value;
         }
@@ -32,15 +31,15 @@ namespace WEBAPI.Controllers
         [HttpPost("Authenticate")]
         public IActionResult Authenticate(AuthenticateRequest model)
         {
-            var response = _userService.Authenticate(model);
+            var response = _useradminService.Authenticate(model);
             return Ok(response);
         }
 
         [AllowAnonymous]
         [HttpPost("Register")]
-        public IActionResult Register(RegisterRequest model)
+        public IActionResult Register(AdminRegisterRequest model)
         {
-            _userService.Register(model);
+            _useradminService.Register(model);
             return Ok(new { message = "Registration successful" });
         }
 
@@ -48,8 +47,8 @@ namespace WEBAPI.Controllers
         [HttpGet("Lists")]
         public IActionResult GetAll()
         {
-            var users = _userService.GetAll();
-            return Ok(users);
+            var usersadmin = _useradminService.GetAll();
+            return Ok(usersadmin);
         }
 
 
@@ -57,15 +56,15 @@ namespace WEBAPI.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var user = _userService.GetById(id);
-            return Ok(user);
+            var useradmin = _useradminService.GetById(id);
+            return Ok(useradmin);
         }
 
         [AllowAnonymous]
         [HttpPut("{id}")]
         public IActionResult Update(int id, UpdateRequest model)
         {
-            _userService.Update(id, model);
+            _useradminService.Update(id, model);
             return Ok(new { message = "User updated successfully" });
         }
 
@@ -73,15 +72,15 @@ namespace WEBAPI.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            _userService.Delete(id);
+            _useradminService.Delete(id);
             return Ok(new { message = "User deleted successfully" });
         }
 
         [AllowAnonymous]
-        [HttpPut("Logout/{TokenId}")]
-        public IActionResult Logout(string TokenId)
+        [HttpPut("Logout/{id}")]
+        public IActionResult Logout(int id)
         {
-            _userService.Logout(TokenId);
+            _useradminService.Logout(id);
             return Ok(new { message = "User successfully logout" });
         }
     }

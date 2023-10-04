@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using WEBAPI.Helpers;
-using WEBAPI.Models.MatchStatus;
+using WEBAPI.Models.BetColor;
 using WEBAPI.Services;
 
 namespace WEBAPI.Controllers
@@ -11,66 +11,66 @@ namespace WEBAPI.Controllers
     [Authorize]
     [ApiController]
     [Route("[controller]")]
-    public class MatchStatusController : ControllerBase
+    public class BetColorController : ControllerBase
     {
-        private IMatchStatusService _matchstatusService;
+        private IColorConfigService _colorconfigService;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
 
-        public MatchStatusController(
-            IMatchStatusService matchStatusService,
+        public BetColorController(
+            IColorConfigService colorConfigService,
             IMapper mapper,
             IOptions<AppSettings> appSettings)
         {
-            _matchstatusService = matchStatusService;
+            _colorconfigService = colorConfigService;
             _mapper = mapper;
             _appSettings = appSettings.Value;
         }
 
         [AllowAnonymous]
-        [HttpPost("CreateStatus")]
+        [HttpPost("CreateColor")]
         public IActionResult Register(UpdateRequest model)
         {
-            _matchstatusService.Create(model);
-            return Ok(new { message = "Match Status created successful" });
+            _colorconfigService.Create(model);
+            return Ok(new { message = "Match Result created successful" });
         }
 
         [AllowAnonymous]
         [HttpGet("SetDefaultValues")]
         public IActionResult SetDefault()
         {
-            _matchstatusService.SetDefault();
-            return Ok(new { message = "Default Status successfully added" });
+            _colorconfigService.SetDefault();
+            return Ok(new { message = "Default Color successfully added" });
         }
 
         [AllowAnonymous]
         [HttpGet("Lists")]
         public IActionResult GetAll()
         {
-            var matchstatus = _matchstatusService.GetAll();
+            var matchstatus = _colorconfigService.GetAll();
             return Ok(matchstatus);
         }
         [AllowAnonymous]
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var user = _matchstatusService.GetById(id);
+            var user = _colorconfigService.GetById(id);
             return Ok(user);
         }
         [AllowAnonymous]
         [HttpPut("{id}")]
         public IActionResult Update(int id, UpdateRequest model)
         {
-            _matchstatusService.Update(id, model);
-            return Ok(new { message = "Match Status updated successfully" });
+            _colorconfigService.Update(id, model);
+            return Ok(new { message = "Color Name updated successfully" });
         }
 
         [AllowAnonymous]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            _matchstatusService.Delete(id);
-            return Ok(new { message = "Match Status deleted successfully" });
+            _colorconfigService.Delete(id);
+            return Ok(new { message = "Color Name deleted successfully" });
         }
     }
 }

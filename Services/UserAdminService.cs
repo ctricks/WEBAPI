@@ -12,7 +12,7 @@ namespace WEBAPI.Services
         IEnumerable<UserAdmin> GetAll();
         UserAdmin GetById(int id);
         void Register(AdminRegisterRequest model);
-        //void Update(int id, UpdateRequest model);
+        void Update(int id, UpdateRequest model);
         void Delete(int id);
         void Logout(int id);
     }

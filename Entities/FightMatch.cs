@@ -8,11 +8,8 @@ namespace WEBAPI.Entities
         public DateTime MatchDate { get; set; }
         public int MatchNumber { get; set; }
 
-        //CB-10022023 Reference for User Bet
-        public virtual ICollection<UserBetTxn> UBetTxn { get; set; }
-
-        //CB-10022023 Reference for Bet Odd
-        public virtual ICollection<BetOdd> UBetOdd { get; set; }
+        public int MatchStatusId { get; set; } = -1;
+        public int MatchResultId { get; set; } = -1;
 
         [Column("create_ts")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;

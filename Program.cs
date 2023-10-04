@@ -41,6 +41,11 @@ builder.Services.AddSwaggerGen();
     services.AddScoped<IJwtUtils, JwtUtils>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IWalletTransactionsService, WalletTransactionsService>();
+    services.AddScoped<IValidation, Validation>();
+    services.AddScoped<IColorConfigService, ColorConfigService>();
+    services.AddScoped<IMatchResultService, MatchResultService>();
+    services.AddScoped<IMatchStatusService, MatchStatusService>();
+    
 
 
     services.AddSwaggerGen(options =>
@@ -55,6 +60,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+    //dataContext.Database.EnsureDeleted();
     dataContext.Database.Migrate();
 }
 

@@ -2,5 +2,6 @@
 
 public class UpdateRequest
 {
-    public string Status { get; set; }        
+    public string Status { get; set; }       
+    public string TokenId { get; set; }
 }

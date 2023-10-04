@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Org.BouncyCastle.Security;
+using System.Net;
 using WEBAPI.Entities;
 using WEBAPI.Helpers;
 using WEBAPI.Models.MatchStatus;
@@ -8,30 +10,38 @@ namespace WEBAPI.Services
     public interface IMatchStatusService
     {
         IEnumerable<MatchStatusConfig> GetAll();
+
+        void SetDefault();
         MatchStatusConfig GetById(int id);
-        void Create(string status);
+        void Create(UpdateRequest model);
         void Update(int id,UpdateRequest model);
         void Delete(int id);        
     }
     public class MatchStatusService : IMatchStatusService
     {
         private DataContext _context;
-            private readonly IMapper _mapper;
+        private readonly IMapper _mapper;
+        
 
         public MatchStatusService(
             DataContext context,
                 IMapper mapper)
         {
                 _context = context;
-                _mapper = mapper;
+                _mapper = mapper;                
         }
-        public void Create(string Status)
+        public void Create(UpdateRequest model)
         {
             //CB-10042023 Validate if exist value
-            if (_context.MatchStatusConfigs.Any(x => x.Status == Status))
+            if (_context.MatchStatusConfigs.Any(x => x.Status == model.Status))
                 throw new AppException("Status is already exists. Please check your entry");
+
+            var adminuser = getUserAdmin(model.TokenId);
             
-            _context.MatchStatusConfigs.Add(new MatchStatusConfig() { Status = Status });
+            if(adminuser == null)
+                throw new AppException("User not allowed to do this. Please use administration account");
+
+            _context.MatchStatusConfigs.Add(new MatchStatusConfig() { Status = model.Status });
             _context.SaveChanges();
         }
 
@@ -39,6 +49,26 @@ namespace WEBAPI.Services
         {
             return _context.MatchStatusConfigs;
         }
+        public void SetDefault()
+        {
+            //CB-10042023 For migration uses Truncate Table and call this for default values
+            //Check if exists
+            string[] StatusValues = new string[] {"OPEN","LAST CALL","CLOSED" };
+
+            object ?matchStatus;
+
+            foreach (string statVal in StatusValues)
+            {
+                matchStatus = _context.MatchStatusConfigs.Where(x => x.Status == statVal).FirstOrDefault();
+                if (matchStatus == null)
+                    _context.MatchStatusConfigs.Add(new MatchStatusConfig { Status = statVal });
+            }
+
+            _context.SaveChanges();
+
+        }
+
+
         public MatchStatusConfig GetById(int id)
         {
             return getMatchStatus(id);
@@ -46,11 +76,15 @@ namespace WEBAPI.Services
 
         public void Update(int id, UpdateRequest model)
         {
-            var matchstatus = getMatchStatus(id);
+            var matchStatus = getMatchStatus(id);
+
+            if(matchStatus == null)
+                throw new AppException("Status not exists. Please check your entry");
+
 
             // copy model to user and save
-            _mapper.Map(model, matchstatus);
-            _context.MatchStatusConfigs.Update(matchstatus);
+            _mapper.Map(model, matchStatus);
+            _context.MatchStatusConfigs.Update(matchStatus);
             _context.SaveChanges();
         }
 
@@ -62,9 +96,15 @@ namespace WEBAPI.Services
         }
         private MatchStatusConfig getMatchStatus(int id)
         {
-            var matchresult = _context.MatchStatusConfigs.Find(id);
-            if (matchresult == null) throw new KeyNotFoundException("User not found");
-            return matchresult;
-        }       
+            var matchStatus = _context.MatchStatusConfigs.Find(id);
+            if (matchStatus == null) throw new KeyNotFoundException("Match Status not found");
+            return matchStatus;
+        }
+        private UserAdmin getUserAdmin(string TokenId)
+        {
+            var user = _context.UserAdmins.Where(x => x.TokenID == TokenId).FirstOrDefault();
+            if (user == null) throw new KeyNotFoundException("Please use Admin Account.");
+            return user;
+        }
     }    
 }

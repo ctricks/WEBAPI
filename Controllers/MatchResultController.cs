@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using WEBAPI.Helpers;
-using WEBAPI.Models.MatchStatus;
+using WEBAPI.Models.MatchResult;
 using WEBAPI.Services;
 
 namespace WEBAPI.Controllers
@@ -11,65 +11,65 @@ namespace WEBAPI.Controllers
     [Authorize]
     [ApiController]
     [Route("[controller]")]
-    public class MatchStatusController : ControllerBase
+    public class MatchResultController : ControllerBase
     {
-        private IMatchStatusService _matchstatusService;
+        private IMatchResultService _matchresultService;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
 
-        public MatchStatusController(
-            IMatchStatusService matchStatusService,
+        public MatchResultController(
+            IMatchResultService matchResultService,
             IMapper mapper,
             IOptions<AppSettings> appSettings)
         {
-            _matchstatusService = matchStatusService;
+            _matchresultService = matchResultService;
             _mapper = mapper;
             _appSettings = appSettings.Value;
         }
 
         [AllowAnonymous]
-        [HttpPost("CreateStatus")]
+        [HttpPost("CreateResult")]
         public IActionResult Register(UpdateRequest model)
         {
-            _matchstatusService.Create(model);
-            return Ok(new { message = "Match Status created successful" });
+            _matchresultService.Create(model);
+            return Ok(new { message = "Match Result created successful" });
         }
 
         [AllowAnonymous]
         [HttpGet("SetDefaultValues")]
         public IActionResult SetDefault()
         {
-            _matchstatusService.SetDefault();
-            return Ok(new { message = "Default Status successfully added" });
+            _matchresultService.SetDefault();
+            return Ok(new { message = "Default Result successfully added" });
         }
 
         [AllowAnonymous]
         [HttpGet("Lists")]
         public IActionResult GetAll()
         {
-            var matchstatus = _matchstatusService.GetAll();
+            var matchstatus = _matchresultService.GetAll();
             return Ok(matchstatus);
         }
         [AllowAnonymous]
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var user = _matchstatusService.GetById(id);
+            var user = _matchresultService.GetById(id);
             return Ok(user);
         }
         [AllowAnonymous]
         [HttpPut("{id}")]
         public IActionResult Update(int id, UpdateRequest model)
         {
-            _matchstatusService.Update(id, model);
-            return Ok(new { message = "Match Status updated successfully" });
+            _matchresultService.Update(id, model);
+            return Ok(new { message = "Match Result updated successfully" });
         }
 
         [AllowAnonymous]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            _matchstatusService.Delete(id);
+            _matchresultService.Delete(id);
             return Ok(new { message = "Match Status deleted successfully" });
         }
     }

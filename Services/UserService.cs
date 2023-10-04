@@ -15,7 +15,7 @@ namespace WEBAPI.Services
         void Register(RegisterRequest model);
         void Update(int id, UpdateRequest model);
         void Delete(int id);
-        void Logout(int id);
+        void Logout(string TokenId);
     }
 
     public class UserService : IUserService
@@ -23,15 +23,18 @@ namespace WEBAPI.Services
         private DataContext _context;
         private IJwtUtils _jwtUtils;
         private readonly IMapper _mapper;
+        private IValidation _validation;
 
         public UserService(
             DataContext context,
             IJwtUtils jwtUtils,
-            IMapper mapper)
+            IMapper mapper,
+            IValidation validation)
         {
             _context = context;
             _jwtUtils = jwtUtils;
             _mapper = mapper;
+            _validation = validation;
         }
 
         public AuthenticateResponse Authenticate(AuthenticateRequest model)
@@ -63,7 +66,7 @@ namespace WEBAPI.Services
 
         public User GetById(int id)
         {
-            return getUser(id);
+            return _validation.getUserById(id);
         }
 
         public void Register(RegisterRequest model)
@@ -94,10 +97,10 @@ namespace WEBAPI.Services
             _context.SaveChanges();
         }
 
-        public void Logout(int id)
+        public void Logout(string TokenId)
         {
             //CB-09302023 Get User via id
-            var user = getUser(id);
+            var user = _validation.getUser(TokenId);
             user.TokenID = null;
             _context.Users.Update(user);
             _context.SaveChanges();
@@ -105,7 +108,7 @@ namespace WEBAPI.Services
 
         public void Update(int id, UpdateRequest model)
         {
-            var user = getUser(id);
+            var user = _validation.getUserById(id);
 
             // validate
             if (model.Username != user.UserName && _context.Users.Any(x => x.UserName == model.Username))
@@ -123,19 +126,19 @@ namespace WEBAPI.Services
 
         public void Delete(int id)
         {
-            var user = getUser(id);
+            var user = _validation.getUserById(id);
             _context.Users.Remove(user);
             _context.SaveChanges();
         }
 
         // helper methods
-
-        private User getUser(int id)
-        {
-            var user = _context.Users.Find(id);
-            if (user == null) throw new KeyNotFoundException("User not found");
-            return user;
-        }
+        // CB-10042023 make it as class function for calling validation
+        //private User getUser(int id)
+        //{
+        //    var user = _context.Users.Find(id);
+        //    if (user == null) throw new KeyNotFoundException("User not found");
+        //    return user;
+        //}
 
 
     }
