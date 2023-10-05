@@ -60,6 +60,8 @@ namespace WEBAPI.Services
 
             _context.SaveChanges();
 
+            response.Id = user.Id;
+
             return response;
         }
 

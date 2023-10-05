@@ -54,6 +54,7 @@ namespace WEBAPI.Services
             _context.SaveChanges();
 
             AdminAuthenticateResponse response = new AdminAuthenticateResponse { 
+                   Id = useradmin.Id,
                    Username = model.Username,
                    Token = useradmin.TokenID,
                    Role = useradmin.Role
