@@ -10,6 +10,8 @@ namespace WEBAPI.Entities
         public string? PhoneNumber { get; set; }
         public string? Role { get; set; }
         public string? TokenID { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime RefreshTokenExpiryTime { get; set; }
 
         //For reference UserWallet Table
         public virtual ICollection<UserWallet> UWallet { get; set; }

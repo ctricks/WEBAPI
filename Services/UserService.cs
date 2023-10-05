@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BCrypt.Net;
+using Microsoft.AspNetCore.Server.IIS.Core;
 using WEBAPI.Authorization;
 using WEBAPI.Entities;
 using WEBAPI.Helpers;
@@ -16,6 +17,7 @@ namespace WEBAPI.Services
         void Update(int id, UpdateRequest model);
         void Delete(int id);
         void Logout(string TokenId);
+        void updateUserToken(string Username,string TokenId, string UserToken,DateTime MinuteExpire);
     }
 
     public class UserService : IUserService
@@ -23,7 +25,7 @@ namespace WEBAPI.Services
         private DataContext _context;
         private IJwtUtils _jwtUtils;
         private readonly IMapper _mapper;
-        private IValidation _validation;
+        private IValidation _validation;        
 
         public UserService(
             DataContext context,
@@ -47,18 +49,36 @@ namespace WEBAPI.Services
 
             // authentication successful
             var response = _mapper.Map<AuthenticateResponse>(user);
-            response.Token = _jwtUtils.GenerateToken(user);
+            
+            //response.Token = _jwtUtils.GenerateToken(user);
 
             //CB-09302023 Update TokenID in UserTable
             //_mapper.Map(model, user);
-            user.TokenID = response.Token;
+            //user.TokenID = response.Token;
 
             _context.Users.Update(user);
+
             _context.SaveChanges();
 
             return response;
         }
 
+        public void updateUserToken(string Username,string TokenId,string RefreshTokenId,DateTime MinuteExpire)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.UserName == Username);
+            if(user != null)
+            {
+                user.TokenID = TokenId;
+                user.RefreshToken = RefreshTokenId;
+
+                user.RefreshTokenExpiryTime = MinuteExpire;
+
+                _context.Users.Update(user);
+
+                _context.SaveChanges();
+            }
+        }
+       
         public IEnumerable<User> GetAll()
         {
             return _context.Users;
