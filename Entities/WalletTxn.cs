@@ -4,6 +4,7 @@ namespace WEBAPI.Entities
 {
     public class WalletTxn
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string TransactionType { get; set; } 
         public double amount { get; set; }

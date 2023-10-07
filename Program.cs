@@ -46,8 +46,9 @@ builder.Services.AddSwaggerGen();
     services.AddScoped<IColorConfigService, ColorConfigService>();
     services.AddScoped<IMatchResultService, MatchResultService>();
     services.AddScoped<IMatchStatusService, MatchStatusService>();
+    services.AddScoped<IFightMatchService, FightMatchService>();
     services.AddScoped<ITokenService, TokenService>();
-    
+    services.AddScoped<IBetTransactionService, BetTransactionService>();
 
 
     services.AddSwaggerGen(options =>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WEBAPI.Helpers;
 
@@ -11,9 +12,10 @@ using WEBAPI.Helpers;
 namespace WEBAPI.Migrations.Data
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231007093227_UpdateDatabase100723_1")]
+    partial class UpdateDatabase100723_1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -321,9 +323,6 @@ namespace WEBAPI.Migrations.Data
                         .HasColumnType("datetime2")
                         .HasColumnName("update_ts");
 
-                    b.Property<int?>("UserBetTxnId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
@@ -334,8 +333,6 @@ namespace WEBAPI.Migrations.Data
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserBetTxnId");
 
                     b.HasIndex("UserId");
 
@@ -393,10 +390,6 @@ namespace WEBAPI.Migrations.Data
 
             modelBuilder.Entity("WEBAPI.Entities.UserWallet", b =>
                 {
-                    b.HasOne("WEBAPI.Entities.UserBetTxn", null)
-                        .WithMany("UWallet")
-                        .HasForeignKey("UserBetTxnId");
-
                     b.HasOne("WEBAPI.Entities.User", null)
                         .WithMany("UWallet")
                         .HasForeignKey("UserId");
@@ -420,11 +413,6 @@ namespace WEBAPI.Migrations.Data
                 });
 
             modelBuilder.Entity("WEBAPI.Entities.User", b =>
-                {
-                    b.Navigation("UWallet");
-                });
-
-            modelBuilder.Entity("WEBAPI.Entities.UserBetTxn", b =>
                 {
                     b.Navigation("UWallet");
                 });

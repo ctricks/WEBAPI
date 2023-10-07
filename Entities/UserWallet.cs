@@ -4,6 +4,7 @@ namespace WEBAPI.Entities
 {
     public class UserWallet
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]        
         public int Id { get; set; }       
         public double? available_balance { get; set; }
         public double? total_balance { get; set; }
