@@ -26,6 +26,7 @@ namespace WEBAPI.Services
         private IJwtUtils _jwtUtils;
         private readonly IMapper _mapper;
         private IValidation _validation;        
+        
 
         public UserService(
             DataContext context,

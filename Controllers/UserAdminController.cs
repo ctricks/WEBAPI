@@ -29,11 +29,13 @@ namespace WEBAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost("Authenticate")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Authenticate(AuthenticateRequest model)
         {
             var response = _useradminService.Authenticate(model);
             return Ok(response);
         }
+
 
         [AllowAnonymous]
         [HttpPost("Register")]
@@ -60,7 +62,8 @@ namespace WEBAPI.Controllers
             return Ok(useradmin);
         }
 
-        [AllowAnonymous]
+        //CB-For Token Authorization
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpPut("{id}")]
         public IActionResult Update(int id, UpdateRequest model)
         {
@@ -68,7 +71,8 @@ namespace WEBAPI.Controllers
             return Ok(new { message = "User updated successfully" });
         }
 
-        [AllowAnonymous]
+        //CB-For Token Authorization
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

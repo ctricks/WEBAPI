@@ -25,11 +25,13 @@ namespace WEBAPI.Services
     {
         private readonly AppSettings _appSettings;
         private readonly DataContext _context;
+        private readonly IConfiguration _config;
 
-        public TokenService(IOptions<AppSettings> appSettings, DataContext context)
+        public TokenService(IOptions<AppSettings> appSettings, DataContext context,IConfiguration config)
         {
             _appSettings = appSettings.Value;
             _context = context;
+            _config = config;
         }
 
         public string GenerateAccessToken(IEnumerable<Claim> claims)
@@ -42,8 +44,9 @@ namespace WEBAPI.Services
 
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var tokeOptions = new JwtSecurityToken(
-                issuer: "https://localhost:5001",
-                audience: "https://localhost:5001",
+                //For JWT Configuration JSON
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"], 
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(expireMinute),
                 signingCredentials: signinCredentials

@@ -1,4 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using WEBAPI.Authorization;
 using WEBAPI.Entities;
 using WEBAPI.Helpers;
@@ -22,15 +26,18 @@ namespace WEBAPI.Services
         private DataContext _context;
         private IJwtUtils _jwtUtils;
         private readonly IMapper _mapper;
+        private IConfiguration _config;
 
         public UserAdminService(
             DataContext context,
             IJwtUtils jwtUtils,
-            IMapper mapper)
+            IMapper mapper,
+            IConfiguration config)
         {
             _context = context;
             _jwtUtils = jwtUtils;
             _mapper = mapper;
+            _config = config;
         }
 
         public AdminAuthenticateResponse Authenticate(AuthenticateRequest model)
@@ -44,11 +51,31 @@ namespace WEBAPI.Services
             // authentication successful
             //var response = _mapper.Map<AdminAuthenticateResponse>(useradmin);
 
-            useradmin.TokenID = _jwtUtils.GenerateTokenAdmin(useradmin);
+            //useradmin.TokenID = _jwtUtils.GenerateTokenAdmin(useradmin);
 
             //CB-09302023 Update TokenID in UserTable
             //_mapper.Map(model, user);
             //useradmin.TokenID = response.Token;
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"]);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, useradmin.UserName),                    
+                    new Claim(ClaimTypes.Role, useradmin.Role)
+                }),
+                IssuedAt = DateTime.UtcNow,
+                Issuer = _config["Jwt:Issuer"],
+                Audience = _config["Jwt:Audience"],
+                Expires = DateTime.UtcNow.AddMinutes(30),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            useradmin.TokenID = tokenHandler.WriteToken(token);
 
             _context.UserAdmins.Update(useradmin);
             _context.SaveChanges();

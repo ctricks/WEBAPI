@@ -22,8 +22,7 @@ namespace WEBAPI.Services
     public class BetTransactionService : IBetTransactionService
     {
         private DataContext _context;
-        private readonly IMapper _mapper;
-        private IValidation _validation;
+        private readonly IMapper _mapper;        
 
         public BetTransactionService(
             DataContext context,

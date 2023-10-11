@@ -13,14 +13,12 @@ namespace WEBAPI.Controllers
     [Route("[controller]")]
     public class FightMatchController : ControllerBase
     {
-        private IFightMatchService _fightmatchService;
-        private readonly ITokenService _tokenService;
+        private IFightMatchService _fightmatchService;      
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
 
         public FightMatchController(
-            IFightMatchService fightmatchService,
-            ITokenService tokenService,
+            IFightMatchService fightmatchService,            
             IMapper mapper,
             IOptions<AppSettings> appSettings)
         {
@@ -29,7 +27,8 @@ namespace WEBAPI.Controllers
             _appSettings = appSettings.Value;
         }
 
-        [AllowAnonymous]
+        //CB-For Token Authorization
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpPost("CreateMatch")]
         public IActionResult Register(FightMatchRequest model)
         {
@@ -52,7 +51,8 @@ namespace WEBAPI.Controllers
             var fightmatch = _fightmatchService.GetFightMatchById(id);
             return Ok(fightmatch);
         }
-        [AllowAnonymous]
+        //CB-For Token Authorization
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpPut("{id}")]
         public IActionResult Update(int id, FightMatchRequest model)
         {
@@ -60,7 +60,8 @@ namespace WEBAPI.Controllers
             return Ok(new { message = "Fight match is updated successfully" });
         }
 
-        [AllowAnonymous]
+        //CB-For Token Authorization
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

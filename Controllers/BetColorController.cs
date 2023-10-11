@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.IdentityModel.Tokens.Jwt;
 using WEBAPI.Helpers;
 using WEBAPI.Models.BetColor;
 using WEBAPI.Services;
@@ -27,7 +29,8 @@ namespace WEBAPI.Controllers
             _appSettings = appSettings.Value;
         }
 
-        [AllowAnonymous]
+        //CB-For Token Authorization
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpPost("CreateColor")]
         public IActionResult Register(UpdateRequest model)
         {
@@ -43,8 +46,7 @@ namespace WEBAPI.Controllers
             return Ok(new { message = "Default Color successfully added" });
         }
 
-        [AllowAnonymous]
-        [HttpGet("Lists")]
+        [HttpGet("Lists")]        
         public IActionResult GetAll()
         {
             var matchstatus = _colorconfigService.GetAll();
@@ -57,7 +59,8 @@ namespace WEBAPI.Controllers
             var user = _colorconfigService.GetById(id);
             return Ok(user);
         }
-        [AllowAnonymous]
+        //CB-For Token Authorization
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpPut()]
         public IActionResult Update(UpdateRequest model)
         {
@@ -65,7 +68,8 @@ namespace WEBAPI.Controllers
             return Ok(new { message = "Color Name updated successfully" });
         }
 
-        [AllowAnonymous]
+        //CB-For Token Authorization
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id, string TokenId)
         {

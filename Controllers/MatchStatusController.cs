@@ -27,7 +27,8 @@ namespace WEBAPI.Controllers
             _appSettings = appSettings.Value;
         }
 
-        [AllowAnonymous]
+        //CB-For Token Authorization
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpPost("CreateStatus")]
         public IActionResult Register(UpdateRequest model)
         {
@@ -57,7 +58,8 @@ namespace WEBAPI.Controllers
             var user = _matchstatusService.GetById(id);
             return Ok(user);
         }
-        [AllowAnonymous]
+        //CB-For Token Authorization
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpPut("{id}")]
         public IActionResult Update(int id, UpdateRequest model)
         {
@@ -65,7 +67,8 @@ namespace WEBAPI.Controllers
             return Ok(new { message = "Match Status updated successfully" });
         }
 
-        [AllowAnonymous]
+        //CB-For Token Authorization
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

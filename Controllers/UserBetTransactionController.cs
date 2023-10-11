@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using WEBAPI.Helpers;
 using WEBAPI.Models.BetTransaction;

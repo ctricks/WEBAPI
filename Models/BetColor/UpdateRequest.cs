@@ -3,6 +3,5 @@
 public class UpdateRequest
 {
     public int ColorId { get; set; }
-    public string ColorName { get; set; }       
-    public string TokenId { get; set; }
+    public string ColorName { get; set; }           
 }

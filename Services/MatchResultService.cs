@@ -36,11 +36,6 @@ namespace WEBAPI.Services
             if (_context.MatchResultConfigs.Any(x => x.Result == model.Result))
                 throw new AppException("Result is already exists. Please check your entry");
 
-            var adminuser = getUserAdmin(model.TokenId);
-
-            if (adminuser == null)
-                throw new AppException("User not allowed to do this. Please use administration account");
-
             _context.MatchResultConfigs.Add(new MatchResultConfig() { Result = model.Result });
             _context.SaveChanges();
         }

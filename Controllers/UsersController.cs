@@ -21,6 +21,7 @@ namespace WEBAPI.Controllers
         private readonly ITokenService _tokenService;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
+        
 
         public UsersController(
             IUserService userService,
@@ -46,6 +47,7 @@ namespace WEBAPI.Controllers
                 new Claim(ClaimTypes.Name, model.Username),
                 new Claim(ClaimTypes.Role, response.Role)
             };
+
             var accessToken = _tokenService.GenerateAccessToken(claims);
             var refreshToken = _tokenService.GenerateRefreshToken();
 

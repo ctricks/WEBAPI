@@ -36,11 +36,6 @@ namespace WEBAPI.Services
             if (_context.MatchStatusConfigs.Any(x => x.Status == model.Status))
                 throw new AppException("Status is already exists. Please check your entry");
 
-            var adminuser = getUserAdmin(model.TokenId);
-            
-            if(adminuser == null)
-                throw new AppException("User not allowed to do this. Please use administration account");
-
             _context.MatchStatusConfigs.Add(new MatchStatusConfig() { Status = model.Status });
             _context.SaveChanges();
         }

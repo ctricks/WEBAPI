@@ -19,8 +19,7 @@ namespace WEBAPI.Services
     {
         private DataContext _context;
         private readonly IMapper _mapper;
-        private IValidation _validation;
-
+        
         public ColorConfigService(
             DataContext context,
                 IMapper mapper)
@@ -33,11 +32,6 @@ namespace WEBAPI.Services
             //CB-10042023 Validate if exist value
             if (_context.BetColorConfigs.Any(x => x.ColorName == model.ColorName))
                 throw new AppException("Status is already exists. Please check your entry");
-
-            var adminuser = getUser(model.TokenId);
-
-            if (adminuser == null)
-                throw new AppException("User not allowed to do this. Please use administration account");
 
             _context.BetColorConfigs.Add(new BetColorConfigs() { ColorName = model.ColorName });
             _context.SaveChanges();
@@ -79,12 +73,6 @@ namespace WEBAPI.Services
 
             if (betColor == null)
                 throw new AppException("Status not exists. Please check your entry");
-
-            //Check for admin tokenID
-            var user = getUserAdmin(model.TokenId);
-
-            if (user == null)
-                throw new AppException("User is invalid. Please use administrator account");
 
             // copy model to user and save
             //_mapper.Map(model, betColor);
