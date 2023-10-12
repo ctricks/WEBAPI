@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -54,11 +55,15 @@ namespace WEBAPI.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet]
+        [HttpGet("ViaBearerToken")]
         public IActionResult GetByIdBearerToken()
         {
-            int id = 0;
-            var useradmin = _useradminService.GetById(id);
+            //Get Username via http (authorize user)
+            var Username = HttpContext.User.Identities.FirstOrDefault().Name.ToString();
+
+            if (Username == null) throw new Exception("Invalid Token Bearer. Please check");
+
+            var useradmin = _useradminService.GetByBearerToken(Username);
             return Ok(useradmin);
         }
 
