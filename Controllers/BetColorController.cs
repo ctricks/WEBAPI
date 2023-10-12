@@ -46,6 +46,7 @@ namespace WEBAPI.Controllers
             return Ok(new { message = "Default Color successfully added" });
         }
 
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpGet("Lists")]        
         public IActionResult GetAll()
         {

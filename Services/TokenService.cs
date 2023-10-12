@@ -94,7 +94,7 @@ namespace WEBAPI.Services
 
             var username = principal.Identity.Name; //this is mapped to the Name claim by default
 
-            var user = _context.Users.Where(x => x.UserName == username && x.TokenID == accessToken).FirstOrDefault();
+            var user = _context.Users.Where(x => x.PhoneNumber == username && x.TokenID == accessToken).FirstOrDefault();
 
             if (user == null)
                 throw new AppException("Invalid User. Please check your user to refresh token");

@@ -1,6 +1,10 @@
 ﻿using AutoMapper;
 using BCrypt.Net;
 using Microsoft.AspNetCore.Server.IIS.Core;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using WEBAPI.Authorization;
 using WEBAPI.Entities;
 using WEBAPI.Helpers;
@@ -25,50 +29,71 @@ namespace WEBAPI.Services
         private DataContext _context;
         private IJwtUtils _jwtUtils;
         private readonly IMapper _mapper;
-        private IValidation _validation;        
-        
+        private IValidation _validation;
+        private IConfiguration _config;        
+
 
         public UserService(
             DataContext context,
             IJwtUtils jwtUtils,
             IMapper mapper,
-            IValidation validation)
+            IValidation validation,
+            IConfiguration config)
         {
             _context = context;
             _jwtUtils = jwtUtils;
             _mapper = mapper;
             _validation = validation;
+            _config = config;
         }
 
         public AuthenticateResponse Authenticate(AuthenticateRequest model)
         {
-            var user = _context.Users.SingleOrDefault(x => x.UserName == model.Username);
+            var user = _context.Users.SingleOrDefault(x => x.PhoneNumber == model.PhoneNumber);
 
             // validate
             if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
-                throw new AppException("Username or password is incorrect");
+                throw new AppException("PhoneNumber is incorrect");
 
             // authentication successful
-            var response = _mapper.Map<AuthenticateResponse>(user);
-            
-            //response.Token = _jwtUtils.GenerateToken(user);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"]);
 
-            //CB-09302023 Update TokenID in UserTable
-            //_mapper.Map(model, user);
-            //user.TokenID = response.Token;
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.MobilePhone, user.PhoneNumber),
+                    new Claim(ClaimTypes.Role, user.Role)
+                }),
+                IssuedAt = DateTime.UtcNow,
+                Issuer = _config["Jwt:Issuer"],
+                Audience = _config["Jwt:Audience"],
+                Expires = DateTime.UtcNow.AddMinutes(30),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+            };
 
-            _context.Users.Update(user);
+            var token = tokenHandler.CreateToken(tokenDescriptor);
 
+            user.TokenID = tokenHandler.WriteToken(token);
+
+            _context.Users.Update(user).Property(x=>x.Id).IsModified = false;            
             _context.SaveChanges();
 
-            response.Id = user.Id;
+            AuthenticateResponse response = new AuthenticateResponse
+            {
+                Id = user.Id,
+                PhoneNumber = user.PhoneNumber,
+                Token = user.TokenID,
+                Role = user.Role
+            };
 
             return response;
         }
 
-        public void updateUserToken(string Username,string TokenId,string RefreshTokenId,DateTime MinuteExpire)
+        public void updateUserToken(string PhoneNumber,string TokenId,string RefreshTokenId,DateTime MinuteExpire)
         {
-            var user = _context.Users.SingleOrDefault(x => x.UserName == Username);
+            var user = _context.Users.SingleOrDefault(x => x.PhoneNumber == PhoneNumber);
             if(user != null)
             {
                 user.TokenID = TokenId;
@@ -76,7 +101,7 @@ namespace WEBAPI.Services
 
                 user.RefreshTokenExpiryTime = MinuteExpire;
 
-                _context.Users.Update(user);
+                _context.Users.Update(user).Property(x=>x.Id).IsModified = false;
 
                 _context.SaveChanges();
             }
@@ -95,8 +120,8 @@ namespace WEBAPI.Services
         public void Register(RegisterRequest model)
         {
             // validate
-            if (_context.Users.Any(x => x.UserName == model.UserName))
-                throw new AppException("Username '" + model.UserName + "' is already taken");
+            if (_context.Users.Any(x => x.PhoneNumber == model.PhoneNumber))
+                throw new AppException("Phone Number '" + model.PhoneNumber+ "' is already taken");
 
             // map model to new user object
             var user = _mapper.Map<User>(model);
@@ -134,8 +159,8 @@ namespace WEBAPI.Services
             var user = _validation.getUserById(id);
 
             // validate
-            if (model.Username != user.UserName && _context.Users.Any(x => x.UserName == model.Username))
-                throw new AppException("Username '" + model.Username + "' is already taken");
+            if (model.PhoneNumber != user.PhoneNumber && _context.Users.Any(x => x.PhoneNumber == model.PhoneNumber))
+                throw new AppException("Phone NUmber '" + model.PhoneNumber + "' is already taken");
 
             // hash password if it was entered
             if (!string.IsNullOrEmpty(model.Password))

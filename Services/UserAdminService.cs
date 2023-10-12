@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using WEBAPI.Authorization;
@@ -12,8 +14,10 @@ namespace WEBAPI.Services
 {
     public interface IUserAdminService
     {
-        AdminAuthenticateResponse Authenticate(AuthenticateRequest model);
+        AdminAuthenticateResponse Authenticate(AdminAuthenticateRequest model);
         IEnumerable<UserAdmin> GetAll();
+
+        UserAdmin GetByBearerToken();
         UserAdmin GetById(int id);
         void Register(AdminRegisterRequest model);
         void Update(int id, UpdateRequest model);
@@ -40,7 +44,7 @@ namespace WEBAPI.Services
             _config = config;
         }
 
-        public AdminAuthenticateResponse Authenticate(AuthenticateRequest model)
+        public AdminAuthenticateResponse Authenticate(AdminAuthenticateRequest model)
         {
             var useradmin = _context.UserAdmins.SingleOrDefault(x => x.UserName == model.Username);
 
@@ -70,7 +74,7 @@ namespace WEBAPI.Services
                 IssuedAt = DateTime.UtcNow,
                 Issuer = _config["Jwt:Issuer"],
                 Audience = _config["Jwt:Audience"],
-                Expires = DateTime.UtcNow.AddMinutes(30),
+                Expires = DateTime.UtcNow.AddMinutes(double.Parse(_config["AppSettings:MinuteExpire"])),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             };
 
@@ -93,6 +97,14 @@ namespace WEBAPI.Services
         public IEnumerable<UserAdmin> GetAll()
         {
             return _context.UserAdmins;
+        }
+
+        public UserAdmin GetByBearerToken()
+        {
+            int id = 0;
+            var user = _context.UserAdmins.Find(id);
+            if (user == null) throw new KeyNotFoundException("User not found");
+            return user;
         }
 
         public UserAdmin GetById(int id)
@@ -141,7 +153,7 @@ namespace WEBAPI.Services
             var user = getUser(id);
 
             // validate
-            if (model.Username != user.UserName && _context.Users.Any(x => x.UserName == model.Username))
+            if (model.Username != user.UserName && _context.UserAdmins.Any(x => x.UserName == model.Username))
                 throw new AppException("Username '" + model.Username + "' is already taken");
 
             // hash password if it was entered

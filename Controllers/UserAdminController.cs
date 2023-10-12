@@ -30,7 +30,7 @@ namespace WEBAPI.Controllers
         [AllowAnonymous]
         [HttpPost("Authenticate")]
         [Authorize(Roles = "Admin")]
-        public IActionResult Authenticate(AuthenticateRequest model)
+        public IActionResult Authenticate(AdminAuthenticateRequest model)
         {
             var response = _useradminService.Authenticate(model);
             return Ok(response);
@@ -53,6 +53,14 @@ namespace WEBAPI.Controllers
             return Ok(usersadmin);
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public IActionResult GetByIdBearerToken()
+        {
+            int id = 0;
+            var useradmin = _useradminService.GetById(id);
+            return Ok(useradmin);
+        }
 
         [AllowAnonymous]
         [HttpGet("{id}")]
