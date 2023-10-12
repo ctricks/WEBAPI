@@ -35,7 +35,7 @@ namespace WEBAPI.Controllers
         public IActionResult Register(UpdateRequest model)
         {
             _colorconfigService.Create(model);
-            return Ok(new { message = "Color created successful" });
+            return Ok(new { message = "Match Result created successful" });
         }
 
         [AllowAnonymous]
@@ -46,7 +46,7 @@ namespace WEBAPI.Controllers
             return Ok(new { message = "Default Color successfully added" });
         }
 
-        [Authorize(Roles = "User,Admin,SuperAdmin")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpGet("Lists")]        
         public IActionResult GetAll()
         {
