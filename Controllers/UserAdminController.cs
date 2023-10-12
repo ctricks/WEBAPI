@@ -30,7 +30,7 @@ namespace WEBAPI.Controllers
         [AllowAnonymous]
         [HttpPost("Authenticate")]
         [Authorize(Roles = "Admin")]
-        public IActionResult Authenticate(AuthenticateRequest model)
+        public IActionResult Authenticate(AdminAuthenticateRequest model)
         {
             var response = _useradminService.Authenticate(model);
             return Ok(response);

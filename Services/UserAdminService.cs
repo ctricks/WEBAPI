@@ -12,7 +12,7 @@ namespace WEBAPI.Services
 {
     public interface IUserAdminService
     {
-        AdminAuthenticateResponse Authenticate(AuthenticateRequest model);
+        AdminAuthenticateResponse Authenticate(AdminAuthenticateRequest model);
         IEnumerable<UserAdmin> GetAll();
         UserAdmin GetById(int id);
         void Register(AdminRegisterRequest model);
@@ -40,7 +40,7 @@ namespace WEBAPI.Services
             _config = config;
         }
 
-        public AdminAuthenticateResponse Authenticate(AuthenticateRequest model)
+        public AdminAuthenticateResponse Authenticate(AdminAuthenticateRequest model)
         {
             var useradmin = _context.UserAdmins.SingleOrDefault(x => x.UserName == model.Username);
 
@@ -141,7 +141,7 @@ namespace WEBAPI.Services
             var user = getUser(id);
 
             // validate
-            if (model.Username != user.UserName && _context.Users.Any(x => x.UserName == model.Username))
+            if (model.Username != user.UserName && _context.UserAdmins.Any(x => x.UserName == model.Username))
                 throw new AppException("Username '" + model.Username + "' is already taken");
 
             // hash password if it was entered

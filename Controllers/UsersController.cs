@@ -44,7 +44,7 @@ namespace WEBAPI.Controllers
             //For Refresh Token
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, model.Username),
+                new Claim(ClaimTypes.MobilePhone, model.PhoneNumber),
                 new Claim(ClaimTypes.Role, response.Role)
             };
 
@@ -63,7 +63,7 @@ namespace WEBAPI.Controllers
                 ExpiredToken = DateTime.Now.AddMinutes(double.Parse(MinuteExpire.ToString()));
             }
 
-            _userService.updateUserToken(model.Username,accessToken, refreshToken,ExpiredToken);
+            _userService.updateUserToken(model.PhoneNumber,accessToken, refreshToken,ExpiredToken);
 
             response.Token = accessToken;
             response.RefreshToken = refreshToken;
