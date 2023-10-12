@@ -53,6 +53,14 @@ namespace WEBAPI.Controllers
             return Ok(usersadmin);
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public IActionResult GetByIdBearerToken()
+        {
+            int id = 0;
+            var useradmin = _useradminService.GetById(id);
+            return Ok(useradmin);
+        }
 
         [AllowAnonymous]
         [HttpGet("{id}")]

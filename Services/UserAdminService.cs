@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using WEBAPI.Authorization;
@@ -14,6 +16,8 @@ namespace WEBAPI.Services
     {
         AdminAuthenticateResponse Authenticate(AdminAuthenticateRequest model);
         IEnumerable<UserAdmin> GetAll();
+
+        UserAdmin GetByBearerToken();
         UserAdmin GetById(int id);
         void Register(AdminRegisterRequest model);
         void Update(int id, UpdateRequest model);
@@ -93,6 +97,14 @@ namespace WEBAPI.Services
         public IEnumerable<UserAdmin> GetAll()
         {
             return _context.UserAdmins;
+        }
+
+        public UserAdmin GetByBearerToken()
+        {
+            int id = 0;
+            var user = _context.UserAdmins.Find(id);
+            if (user == null) throw new KeyNotFoundException("User not found");
+            return user;
         }
 
         public UserAdmin GetById(int id)
