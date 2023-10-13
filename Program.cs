@@ -139,21 +139,21 @@ app.UseAuthorization();
 app.MapControllers();
 
 // configure HTTP request pipeline
-{
-    // global cors policy
-    app.UseCors(x => x
+
+// global cors policy
+app.UseCors(x => x
         .AllowAnyOrigin()
         .AllowAnyMethod()
-        .AllowAnyHeader());
+        .AllowAnyHeader()
+        .WithOrigins("http://localhost:3000").AllowAnyMethod());
 
     // global error handler
-    app.UseMiddleware<ErrorHandlerMiddleware>();
+app.UseMiddleware<ErrorHandlerMiddleware>();
 
     // custom jwt auth middleware
-    app.UseMiddleware<JwtMiddleware>();
+app.UseMiddleware<JwtMiddleware>();
+app.MapControllers();
 
-    app.MapControllers();
-}
 
 
 app.Run();
