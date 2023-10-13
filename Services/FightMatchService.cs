@@ -52,8 +52,13 @@ namespace WEBAPI.Services
             if (_context.FightMatches.Any(x => x.MatchDate == model.FightDate && x.MatchNumber == model.MatchNumber))
                 throw new AppException("Fight Number: '" + model.MatchNumber + "' is already exists");
 
-            // validate match number in fightmatchconfig TBD
-            
+            // validate match number in fightmatchconfig CB-10132023 Check Date if fightmatchconfig is already created
+            var fightmatchconfig = _context.FightMatchConfigs.Where(x=>x.MatchDate.Year == model.FightDate.Year
+                            && x.MatchDate.Month == model.FightDate.Month
+                            && x.MatchDate.Day == model.FightDate.Day).FirstOrDefault();
+
+            if(fightmatchconfig == null)
+                throw new AppException("No FightMatch Number found for today. Please start the Fight Match first");
 
             // map model to new user object
             //var useradmin = _mapper.Map<UserAdmin>(model);
