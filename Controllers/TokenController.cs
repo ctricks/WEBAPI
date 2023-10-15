@@ -46,7 +46,7 @@ namespace WEBAPI.Controllers
             string refreshToken = tokenrequest.RefreshToken;
             var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
 
-            TokenResponse response = _tokenService.Refresh(tokenrequest);
+            TokenResponse response = _tokenService.RefreshAdmin(tokenrequest);
 
             return Ok(response);
         }

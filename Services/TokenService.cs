@@ -37,7 +37,10 @@ namespace WEBAPI.Services
         public string GenerateAccessToken(IEnumerable<Claim> claims)
         {
             var secretKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.Secret));
-            double expireMinute = 1;
+
+            double expireMinute = 0;
+
+            if(double.TryParse(_appSettings.MinuteExpire.ToString(),out expireMinute)) { expireMinute = double.Parse(_appSettings.MinuteExpire.ToString()); }
 
             if (!string.IsNullOrEmpty(_appSettings.MinuteExpire))
                 expireMinute = Double.Parse(_appSettings.MinuteExpire);
