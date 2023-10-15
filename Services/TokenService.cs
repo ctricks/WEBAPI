@@ -102,6 +102,8 @@ namespace WEBAPI.Services
             var newAccessToken = GenerateAccessToken(principal.Claims);
             var newRefreshToken = GenerateRefreshToken();
 
+            //Save ID's on DB for next validation
+            user.TokenID = newAccessToken;
             user.RefreshToken = newRefreshToken;
             
             _context.SaveChanges();
@@ -138,6 +140,8 @@ namespace WEBAPI.Services
             var newAccessToken = GenerateAccessToken(principal.Claims);
             var newRefreshToken = GenerateRefreshToken();
 
+            //Save ID's on DB for next validation
+            user.TokenID = newAccessToken;
             user.RefreshToken = newRefreshToken;
 
             _context.SaveChanges();
