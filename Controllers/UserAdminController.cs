@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 using WEBAPI.Helpers;
 using WEBAPI.Models.Users;
 using WEBAPI.Services;
@@ -15,25 +16,58 @@ namespace WEBAPI.Controllers
     public class UserAdminController : ControllerBase
     {
         private IUserAdminService _useradminService;
+        private readonly ITokenService _tokenService;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
 
         public UserAdminController(
             IUserAdminService useradminService,
+            ITokenService tokenService,
             IMapper mapper,
             IOptions<AppSettings> appSettings)
         {
             _useradminService = useradminService;
+            _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
             _mapper = mapper;
             _appSettings = appSettings.Value;
         }
 
         [AllowAnonymous]
-        [HttpPost("Authenticate")]
         [Authorize(Roles = "Admin")]
+        [HttpPost("Authenticate")]
         public IActionResult Authenticate(AdminAuthenticateRequest model)
         {
             var response = _useradminService.Authenticate(model);
+
+            //For Refresh Token
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, model.Username),
+                new Claim(ClaimTypes.Role, response.Role)
+            };
+
+            var accessToken = _tokenService.GenerateAccessToken(claims);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+
+            string MinuteExpire = _appSettings.MinuteExpire;
+
+            DateTime ExpiredToken = DateTime.Now;
+
+            if (MinuteExpire == null)
+            {
+                ExpiredToken = DateTime.Now.AddMinutes(5);
+            }
+            else
+            {
+                ExpiredToken = DateTime.Now.AddMinutes(double.Parse(MinuteExpire.ToString()));
+            }
+
+            _useradminService.updateUserToken(model.Username, accessToken, refreshToken, ExpiredToken);
+
+            response.Token = accessToken;
+            response.RefreshToken = refreshToken;
+            response.ExpireToken = ExpiredToken;
+
             return Ok(response);
         }
 

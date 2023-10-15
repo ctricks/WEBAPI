@@ -26,6 +26,7 @@ namespace WEBAPI.Services
         void Update(int id, UpdateRequest model);
         void Delete(int id);
         void Logout(int id);
+        void updateUserToken(string Username, string TokenId, string UserToken, DateTime MinuteExpire);
     }
 
     public class UserAdminService : IUserAdminService
@@ -95,6 +96,22 @@ namespace WEBAPI.Services
                 };
 
             return response;
+        }
+
+        public void updateUserToken(string Username, string TokenId, string RefreshTokenId, DateTime MinuteExpire)
+        {
+            var user = _context.UserAdmins.SingleOrDefault(x => x.UserName == Username);
+            if (user != null)
+            {
+                user.TokenID = TokenId;
+                user.RefreshToken = RefreshTokenId;
+
+                user.RefreshTokenExpiryTime = MinuteExpire;
+
+                _context.UserAdmins.Update(user).Property(x => x.Id).IsModified = false;
+
+                _context.SaveChanges();
+            }
         }
 
         public IEnumerable<UserAdmin> GetAll()

@@ -92,7 +92,7 @@ namespace WEBAPI.Services
 
             var principal = GetPrincipalFromExpiredToken(accessToken);
 
-            var username = principal.Identity.Name; //this is mapped to the Name claim by default
+            var username = principal.Identities.FirstOrDefault().Claims.FirstOrDefault().Value; //this is mapped to the Name claim by default
 
             var user = _context.Users.Where(x => x.PhoneNumber == username && x.TokenID == accessToken).FirstOrDefault();
 
@@ -106,7 +106,14 @@ namespace WEBAPI.Services
             
             _context.SaveChanges();
 
-            TokenResponse response = new TokenResponse { AccessToken = newAccessToken, RefreshToken = newRefreshToken,  ExpireDate= user.RefreshTokenExpiryTime};
+            TokenResponse response = new TokenResponse { 
+                AccessToken = newAccessToken, 
+                RefreshToken = newRefreshToken,  
+                ExpireDate= user.RefreshTokenExpiryTime,
+                UserId = user.Id,
+                UserRole = user.Role,
+                PhoneNumber = user.PhoneNumber
+            };
 
             return response;
         }
