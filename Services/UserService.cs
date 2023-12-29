@@ -64,7 +64,8 @@ namespace WEBAPI.Services
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.MobilePhone, user.PhoneNumber),
-                    new Claim(ClaimTypes.Role, user.Role)
+                    new Claim(ClaimTypes.Role, user.Role),
+                    new Claim("id", user.Id.ToString())
                 }),
                 IssuedAt = DateTime.UtcNow,
                 Issuer = _config["Jwt:Issuer"],

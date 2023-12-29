@@ -28,7 +28,7 @@ namespace WEBAPI.Controllers
         }
 
         //CB-For Token Authorization
-        [Authorize(Roles = "Admin,SuperAdmin")]
+        [Authorize(Roles ="Admin")]
         [HttpPost("CreateMatch")]
         public IActionResult Register(FightMatchRequest model)
         {

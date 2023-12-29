@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -22,6 +23,10 @@ namespace WEBAPI.Services
 
         UserAdmin GetByBearerToken(string Username);
         UserAdmin GetById(int id);
+
+        UserAdmin GetUserByToken(string Token);
+
+        UserAdmin GetUserByTokenValidation(string Token);
         void Register(AdminRegisterRequest model);
         void Update(int id, UpdateRequest model);
         void Delete(int id);
@@ -57,13 +62,6 @@ namespace WEBAPI.Services
                 throw new AppException("Username or password is incorrect");
 
             // authentication successful
-            //var response = _mapper.Map<AdminAuthenticateResponse>(useradmin);
-
-            //useradmin.TokenID = _jwtUtils.GenerateTokenAdmin(useradmin);
-
-            //CB-09302023 Update TokenID in UserTable
-            //_mapper.Map(model, user);
-            //useradmin.TokenID = response.Token;
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"]);
@@ -72,8 +70,9 @@ namespace WEBAPI.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, useradmin.UserName),                    
-                    new Claim(ClaimTypes.Role, useradmin.Role)
+                    new Claim(ClaimTypes.Name, useradmin.UserName),
+                    new Claim(ClaimTypes.Role, useradmin.Role),
+                    new Claim("id", useradmin.Id.ToString())
                 }),
                 IssuedAt = DateTime.UtcNow,
                 Issuer = _config["Jwt:Issuer"],
@@ -84,6 +83,8 @@ namespace WEBAPI.Services
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             useradmin.TokenID = tokenHandler.WriteToken(token);
+
+
 
             _context.UserAdmins.Update(useradmin);
             _context.SaveChanges();
@@ -123,6 +124,19 @@ namespace WEBAPI.Services
         {            
             var user = _context.UserAdmins.Where(x=>x.UserName == Username).FirstOrDefault();
             if (user == null) throw new KeyNotFoundException("User not found");
+            return user;        
+        }
+
+        public UserAdmin GetUserByToken(string Token)
+        {
+            var user = _context.UserAdmins.Where(x => x.TokenID == Token).FirstOrDefault();
+            if (user == null) throw new KeyNotFoundException("User not found");
+            return user;
+        }
+
+        public UserAdmin GetUserByTokenValidation(string Token)
+        {
+            var user = _context.UserAdmins.Where(x => x.TokenID == Token).FirstOrDefault();            
             return user;
         }
 

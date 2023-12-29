@@ -45,7 +45,8 @@ namespace WEBAPI.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.MobilePhone, model.PhoneNumber),
-                new Claim(ClaimTypes.Role, response.Role)
+                new Claim(ClaimTypes.Role, response.Role),
+                new Claim("id", response.Id.ToString())
             };
 
             var accessToken = _tokenService.GenerateAccessToken(claims);

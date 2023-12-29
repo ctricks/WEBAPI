@@ -41,7 +41,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "JWT Auth Sample",
+        Title = "WEB API",
         Version = "v1"
     });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
@@ -80,7 +80,12 @@ builder.Services.AddSwaggerGen(c => {
     //For AzureConnection
     services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("WebApiDatabase")));
 
-    services.AddCors();
+    builder.Services.AddCors(confg =>
+                confg.AddPolicy("AllowAll",
+                p => p.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()));
+    
     services.AddControllers();
 
     // configure automapper with all automapper profiles from this assembly
@@ -116,7 +121,7 @@ using (var scope = app.Services.CreateScope())
 {
     var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
     //dataContext.Database.EnsureDeleted();
-    dataContext.Database.Migrate();
+    //dataContext.Database.Migrate();
 }
 
 // Configure the HTTP request pipeline.
@@ -126,8 +131,8 @@ using (var scope = app.Services.CreateScope())
 //    app.UseSwaggerUI();
 //    app.UseDeveloperExceptionPage();
 //}
-
 app.UseSwagger();
+
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
@@ -136,22 +141,6 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.MapControllers();
-
-// configure HTTP request pipeline
-
-// global cors policy
-app.UseCors(x => x
-        .AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .WithOrigins("http://localhost:3000").AllowAnyMethod());
-
-    // global error handler
-app.UseMiddleware<ErrorHandlerMiddleware>();
-
-    // custom jwt auth middleware
-app.UseMiddleware<JwtMiddleware>();
 app.MapControllers();
 
 
